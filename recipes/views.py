@@ -5,8 +5,8 @@ def home(request):
         'name': 'Receitas',
         })
 
-def contato(request):
-    return render(request, 'recipes/contato.html')
+def recipe(request, id):
+    return render(request, 'recipes/pages/recipe-view.html', context={
+        'name': 'Luiz Otávio',
+    })
 
-def sobre(request):
-    return render(request, 'recipes/sobre.html')
