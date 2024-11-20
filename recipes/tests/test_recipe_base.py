@@ -1,10 +1,7 @@
 from django.test import TestCase
 from recipes.models import Category, Recipe, User
 
-
-class RecipeTestBase(TestCase):
-    def setUp(self) -> None:
-        return super().setUp()
+class RecipeMixin:
     def make_category(self, name='Category'):
         return Category.objects.create(name=name)
     def make_author(
@@ -13,15 +10,13 @@ class RecipeTestBase(TestCase):
         last_name='name',
         username='username',
         password='123456',
-        email='username@email.com',
-    ):
+        email='username@email.com', ):
         return User.objects.create_user(
             first_name=first_name,
             last_name=last_name,
             username=username,
             password=password,
-            email=email,
-        )
+            email=email,)
     def make_recipe(
         self,
         category_data=None,
@@ -35,14 +30,11 @@ class RecipeTestBase(TestCase):
         servings_unit='Porções',
         preparation_steps='Recipe Preparation Steps',
         preparation_steps_is_html=False,
-        is_published=True,
-    ):
+        is_published=True, ):
         if category_data is None:
             category_data = {}
-
         if author_data is None:
             author_data = {}
-
         return Recipe.objects.create(
             category=self.make_category(**category_data),
             author=self.make_author(**author_data),
@@ -55,5 +47,15 @@ class RecipeTestBase(TestCase):
             servings_unit=servings_unit,
             preparation_steps=preparation_steps,
             preparation_steps_is_html=preparation_steps_is_html,
-            is_published=is_published,
-        )
+            is_published=is_published,)
+    def make_recipe_in_batch(self, qtd=10):
+        recipes = []
+        for i in range(qtd):
+            kwargs = {'title': f'Recipe Title {i}', 'slug': f'r{i}', 'author_data': {'username': f'u{i}'}}
+            recipe = self.make_recipe(**kwargs)
+            recipes.append(recipe)
+        return recipes
+
+class RecipeTestBase(TestCase, RecipeMixin):
+    def setUp(self) -> None:
+        return super().setUp()
