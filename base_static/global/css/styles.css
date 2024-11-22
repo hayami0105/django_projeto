@@ -394,7 +394,10 @@ h6 {
     background: var(--color-debug-light);
     color: var(--color-debug-dark);
 }
-
+/* Authors */
+.login-message {
+    margin: 1rem 0;
+}
 /* Generics */
 .center {
     text-align: center;
@@ -407,7 +410,5 @@ h6 {
 }
 @media (max-width: 600px) {
     .main-content-list
-    .form-content-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
-    }
+    .form-content-grid {grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));}
 }
