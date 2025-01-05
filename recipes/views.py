@@ -6,8 +6,12 @@ import os
 from django.views.generic import ListView, DetailView
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
+from django.shortcuts import render
 
 PER_PAGE = int(os.environ.get('PER_PAGE', 6))
+
+def theory(request, *args, **kwargs):
+    return render(request, 'recipes/pages/theory.html')
 
 class RecipeListViewBase(ListView):
     model = Recipe
@@ -17,6 +21,7 @@ class RecipeListViewBase(ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(is_published=True,)
+        qs = qs.select_related('author', 'category')
         return qs
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
