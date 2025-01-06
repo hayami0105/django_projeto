@@ -8,5 +8,13 @@
 </head>
 <body>
   <h1>Theory</h1>
+  <p>Qt de receitas: {{number_of_recipes}}</p>
+  <ul>
+    {% for recipe in recipes %}
+      <li>{{ recipe.id }} {{ recipe.author__username }} {{ recipe.title }}</li>
+    {% empty %}
+      <p>No recipes found</p>
+    {% endfor %}
+  </ul>
 </body>
 </html>

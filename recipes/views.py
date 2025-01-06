@@ -1,17 +1,22 @@
 from django.http.response import Http404
 from recipes.models import Recipe
 from django.db.models import Q
+from django.db.models.aggregates import Count
 from utils.pagination import make_pagination
 import os
 from django.views.generic import ListView, DetailView
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.shortcuts import render
+from tag.models import Tag
 
-PER_PAGE = int(os.environ.get('PER_PAGE', 6))
+PER_PAGE = int(os.environ.get('PER_PAGE', 2))
 
 def theory(request, *args, **kwargs):
-    return render(request, 'recipes/pages/theory.html')
+    recipes= Recipe.objects.values('id', 'title', 'author__username')[:10]
+    number_of_recipes = recipes.aggregate(number=Count('id'))
+    context= {'recipes': recipes, 'number_of_recipes': number_of_recipes['number']}
+    return render(request, 'recipes/pages/theory.html', context=context)
 
 class RecipeListViewBase(ListView):
     model = Recipe
@@ -22,6 +27,7 @@ class RecipeListViewBase(ListView):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(is_published=True,)
         qs = qs.select_related('author', 'category')
+        qs = qs.prefetch_related('tags')
         return qs
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
@@ -50,6 +56,21 @@ class RecipeListViewCategory(RecipeListViewBase):
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
         ctx.update({'title': f'{ctx.get("recipes")[0].category.name} - Category | '})
+        return ctx
+
+class RecipeListViewTag(RecipeListViewBase):
+    template_name = 'recipes/pages/tag.html'
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(tags__slug=self.kwargs.get('slug', ''))
+        return qs
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        page_title = Tag.objects.filter(slug=self.kwargs.get('slug', '')).first()
+        if not page_title:
+            page_title = 'No recipes found'
+        page_title = f'{page_title} - Tag |'
+        ctx.update({'page_title': page_title,})
         return ctx
 
 class RecipeListViewSearch(RecipeListViewBase):
