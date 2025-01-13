@@ -10,10 +10,7 @@ from recipes.models import Recipe
 def register_view(request):
     register_form_data= request.session.get('register_form_data', None)
     form = RegisterForm(register_form_data)
-    return render(request, 'authors/pages/register_view.html', {
-        'form': form,
-        'form_action': reverse('authors:register_create'),
-    })
+    return render(request, 'authors/pages/register_view.html', {'form': form, 'form_action': reverse('authors:register_create'),})
 
 def register_create(request):
     if not request.POST:
@@ -32,20 +29,14 @@ def register_create(request):
 
 def login_view(request):
     form = LoginForm()
-    return render(request, 'authors/pages/login.html', {
-        'form': form,
-        'form_action': reverse('authors:login_create')
-    })
+    return render(request, 'authors/pages/login.html', {'form': form, 'form_action': reverse('authors:login_create'),})
 
 def login_create(request):
     if not request.POST:
         raise Http404()
     form = LoginForm(request.POST)
     if form.is_valid():
-        authenticated_user = authenticate(
-            username=form.cleaned_data.get('username', ''),
-            password=form.cleaned_data.get('password', ''),
-        )
+        authenticated_user = authenticate(username=form.cleaned_data.get('username', ''), password=form.cleaned_data.get('password', ''),)
         if authenticated_user is not None:
             messages.success(request, 'Your are logged in.')
             login(request, authenticated_user)
