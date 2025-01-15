@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from utils.django_forms import add_placeholder, strong_password
 
+
 class RegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -12,6 +13,7 @@ class RegisterForm(forms.ModelForm):
         add_placeholder(self.fields['last_name'], 'Ex.: Doe')
         add_placeholder(self.fields['password'], 'Type your password')
         add_placeholder(self.fields['password2'], 'Repeat your password')
+
     username = forms.CharField(
         label='Username',
         help_text=(
@@ -47,10 +49,17 @@ class RegisterForm(forms.ModelForm):
             'Password must have at least one uppercase letter, '
             'one lowercase letter and one number. The length should be '
             'at least 8 characters.'
-        ), validators=[strong_password], label='Password')
+        ),
+        validators=[strong_password],
+        label='Password'
+    )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(), label='Password2',
-        error_messages={'required': 'Please, repeat your password'},)
+        widget=forms.PasswordInput(),
+        label='Password2',
+        error_messages={
+            'required': 'Please, repeat your password'
+        },
+    )
 
     class Meta:
         model = User
@@ -65,14 +74,20 @@ class RegisterForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email', '')
         exists = User.objects.filter(email=email).exists()
+
         if exists:
-            raise ValidationError('User e-mail is already in use', code='invalid',)
+            raise ValidationError(
+                'User e-mail is already in use', code='invalid',
+            )
+
         return email
-            
+
     def clean(self):
         cleaned_data = super().clean()
+
         password = cleaned_data.get('password')
         password2 = cleaned_data.get('password2')
+
         if password != password2:
             password_confirmation_error = ValidationError(
                 'Password and password2 must be equal',
@@ -84,4 +99,3 @@ class RegisterForm(forms.ModelForm):
                     password_confirmation_error,
                 ],
             })
-

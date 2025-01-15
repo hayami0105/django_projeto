@@ -1,10 +1,12 @@
 import math
+
 from django.core.paginator import Paginator
 
 # python -c
 # "import string as s;from random import SystemRandom as
 # sr;print(''.join(sr().choices(s.ascii_letters +
 # s.punctuation, k=64)))"
+
 
 def make_pagination_range(
     page_range,
@@ -38,6 +40,7 @@ def make_pagination_range(
         'last_page_out_of_range': stop_range < total_pages,
     }
 
+
 def make_pagination(request, queryset, per_page, qty_pages=4):
     try:
         current_page = int(request.GET.get('page', 1))
@@ -52,4 +55,5 @@ def make_pagination(request, queryset, per_page, qty_pages=4):
         qty_pages,
         current_page
     )
+
     return page_obj, pagination_range
